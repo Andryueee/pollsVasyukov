@@ -1,0 +1,16 @@
+<!-- polls/templates/polls/poll_detail.html -->
+
+{% extends 'polls/base.html' %}
+
+{% block content %}
+<h2>{{ poll.question }}</h2>
+<ul>
+    {% for choice in poll.choice_set.all %}
+        <li>{{ choice.choice_text }} - {{ choice.votes }} votes</li>
+    {% endfor %}
+</ul>
+
+{% if user.is_authenticated %}
+    <p><a href="{% url 'polls:logout' %}">Logout</a></p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,63 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
+from .models import UserProfile, Poll, Choice
+from .forms import UserProfileForm, PollForm, RegistrationForm
+
+def index(request):
+    polls = Poll.objects.all()
+    return render(request, 'polls/index.html', {'polls': polls})
+
+def poll_detail(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    return render(request, 'polls/poll_detail.html', {'poll': poll})
+
+@login_required
+def edit_profile(request):
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('polls:edit_profile')
+    else:
+        form = UserProfileForm(instance=user_profile)
+    return render(request, 'polls/edit_profile.html', {'form': form})
+
+@login_required
+def delete_profile(request):
+    if request.method == 'POST':
+        request.user.delete()
+        return redirect('polls:index')
+    return render(request, 'polls/delete_profile.html')
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(request, username=username, password=password)
+            login(request, user)
+            return redirect('polls:index')
+    else:
+        form = RegistrationForm()
+    return render(request, 'polls/register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('polls:index')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'polls/login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('polls:index')

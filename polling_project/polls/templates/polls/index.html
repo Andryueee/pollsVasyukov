@@ -1,0 +1,14 @@
+<!-- polls/templates/polls/index.html -->
+
+{% extends 'polls/base.html' %}
+
+{% block content %}
+<h2>Polls</h2>
+{% for poll in polls %}
+    <p><a href="{% url 'polls:poll_detail' poll.id %}">{{ poll.question }}</a></p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+    <p><a href="{% url 'polls:logout' %}">Logout</a></p>
+{% endif %}
+{% endblock %}

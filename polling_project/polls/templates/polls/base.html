@@ -1,0 +1,38 @@
+<!-- templates/base.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Django App{% endblock %}</title>
+</head>
+<body>
+
+    <header>
+        <h1>{% block header %}My Django App{% endblock %}</h1>
+        <nav>
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'polls:edit_profile' %}">Edit Profile</a></li>
+                    <li><a href="{% url 'polls:delete_profile' %}">Delete Profile</a></li>
+                    <li><a href="{% url 'polls:logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'polls:login' %}">Login</a></li>
+                    <li><a href="{% url 'polls:register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2023 My Django App. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
