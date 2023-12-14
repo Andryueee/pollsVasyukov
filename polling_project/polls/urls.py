@@ -1,7 +1,7 @@
 # polls/urls.py
 
 from django.urls import path, re_path
-from .views import index, poll_detail, edit_profile, delete_profile, register, login_view, logout_view
+from .views import index, poll_detail, edit_profile, delete_profile, register, login_view, logout_view, vote
 
 app_name = 'polls'
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('<int:poll_id>/vote/', vote, name='vote'),
 ]

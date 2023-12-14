@@ -1,16 +1,24 @@
-<!-- polls/templates/polls/poll_detail.html -->
-
-{% extends 'polls/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <h2>{{ poll.question }}</h2>
+{% if poll.has_expired %}
+    <p>This poll has ended.</p>
+{% else %}
+    <form method="post" action="{% url 'polls:vote' poll.id %}">
+        {% csrf_token %}
+        {% for choice in choices %}
+            <input type="radio" name="choice" value="{{ choice.id }}" id="choice_{{ choice.id }}">
+            <label for="choice_{{ choice.id }}">{{ choice.choice_text }}</label><br>
+        {% endfor %}
+        <button type="submit" {% if poll.has_expired %}disabled{% endif %}>Vote</button>
+    </form>
+{% endif %}
+<h3>Results:</h3>
 <ul>
-    {% for choice in poll.choice_set.all %}
-        <li>{{ choice.choice_text }} - {{ choice.votes }} votes</li>
+    {% for choice, percentage in percentage_votes %}
+        <li>{{ choice }} - {{ percentage }}%</li>
     {% endfor %}
 </ul>
-
-{% if user.is_authenticated %}
-    <p><a href="{% url 'polls:logout' %}">Logout</a></p>
-{% endif %}
+<p>Total votes: {{ total_votes }}</p>
 {% endblock %}
