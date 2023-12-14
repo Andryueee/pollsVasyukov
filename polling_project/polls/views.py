@@ -2,13 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from .models import UserProfile, Poll, Choice
+from .models import UserProfile, Poll, Choice, Question
 from .forms import UserProfileForm, PollForm, RegistrationForm
 from django.utils import timezone
+from django.views import generic
 
-def index(request):
-    polls = Poll.objects.filter(is_active=True, end_date__gt=timezone.now())
-    return render(request, 'polls/index.html', {'polls': polls})
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        return Question.objects.order_by('-pub_date')
 
 def poll_detail(request, poll_id):
     def poll_detail(request, poll_id):
@@ -81,3 +85,21 @@ def vote(request, poll_id):
         return redirect('polls:poll_detail', poll_id=poll.id)
     else:
         return redirect('polls:index')
+
+
+@login_required
+def create_poll(request):
+    if request.method == 'POST':
+        form = PollForm(request.POST)
+        if form.is_valid():
+            poll = form.save(commit=False)
+            poll.created_by = request.user
+            poll.save()
+            return redirect('polls:index')  # Изменение на 'polls:index'
+    else:
+        form = PollForm()
+    return render(request, 'polls/create_poll.html', {'form': form})
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'polls/results.html'

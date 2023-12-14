@@ -17,3 +17,8 @@ class RegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'password1', 'password2']
+
+class VoteForm(forms.Form):
+    CHOICES = [(1, 'Option 1'), (2, 'Option 2')]  # Предположим, у вас есть два варианта ответов
+    vote_option = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
+

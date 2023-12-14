@@ -11,4 +11,7 @@
 {% if user.is_authenticated %}
     <p><a href="{% url 'polls:logout' %}">Logout</a></p>
 {% endif %}
+
+<h2>Create a New Poll</h2>
+<a href="{% url 'polls:create_poll' %}">Create Poll</a>
 {% endblock %}
