@@ -14,11 +14,13 @@
         <button type="submit" {% if poll.has_expired %}disabled{% endif %}>Vote</button>
     </form>
 {% endif %}
-<h3>Results:</h3>
-<ul>
-    {% for choice, percentage in percentage_votes %}
-        <li>{{ choice }} - {{ percentage }}%</li>
-    {% endfor %}
-</ul>
+{% if total_votes %}
+    <h3>Results</h3>
+    <ul>
+      {% for choice, percentage, voter_count in zip(choices, percentage_votes, choice_voter_counts) %}
+        <li>{{ choice.choice_text }} - {{ percentage }}% votes ({{ voter_count }} voters)</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 <p>Total votes: {{ total_votes }}</p>
 {% endblock %}

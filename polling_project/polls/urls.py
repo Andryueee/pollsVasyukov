@@ -5,14 +5,16 @@ from .views import poll_detail, edit_profile, delete_profile, register, login_vi
 
 app_name = 'polls'
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
+    path('catalog/', views.IndexView.as_view(), name='index'),
+    path('polls/', views.PollsView.as_view(), name='polls_views'),
+    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
     path('<int:poll_id>/', poll_detail, name='poll_detail'),
     path('edit_profile/', edit_profile, name='edit_profile'),
     path('delete_profile/', delete_profile, name='delete_profile'),
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
-    path('<int:poll_id>/vote/', vote, name='vote'),
-    path('<int:poll_id>/results/', views.ResultsView.as_view(), name='results'),
-    path('create/', create_poll, name='create_poll'),  # Новый URL-маршрут
+    path('<int:question_id>/vote/', views.vote, name='vote'),
+    path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+
 ]

@@ -3,15 +3,11 @@
 {% extends 'polls/base.html' %}
 
 {% block content %}
-<h2>Polls</h2>
-{% for poll in polls %}
-    <p><a href="{% url 'polls:poll_detail' poll.id %}">{{ poll.question }}</a></p>
-{% endfor %}
+<h2>Polls:</h2>
 
-{% if user.is_authenticated %}
-    <p><a href="{% url 'polls:logout' %}">Logout</a></p>
-{% endif %}
+    <p><a href="{% url 'polls:polls_views' %}">Polls</a></p>
 
-<h2>Create a New Poll</h2>
-<a href="{% url 'polls:create_poll' %}">Create Poll</a>
+
+
+
 {% endblock %}

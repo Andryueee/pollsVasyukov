@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,6 +7,22 @@ from .models import UserProfile, Poll, Choice, Question
 from .forms import UserProfileForm, PollForm, RegistrationForm
 from django.utils import timezone
 from django.views import generic
+from django.urls import reverse
+from django.http import HttpResponse, HttpResponseRedirect
+
+
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+
+
+
+class PollsView(generic.ListView):
+    template_name = 'polls/polls.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        return Question.objects.order_by('-pub_date')
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
@@ -76,15 +93,19 @@ def logout_view(request):
 
 
 @login_required
-def vote(request, poll_id):
-    poll = get_object_or_404(Poll, pk=poll_id, is_active=True, end_date__gt=timezone.now())
-    if request.method == 'POST':
-        selected_choice = get_object_or_404(Choice, pk=request.POST['choice'])
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        return render(request, 'polls/detail.html', {
+            'question': question,
+            'error_message': 'вы не сделали выбор'
+        })
+    else:
         selected_choice.votes += 1
         selected_choice.save()
-        return redirect('polls:poll_detail', poll_id=poll.id)
-    else:
-        return redirect('polls:index')
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 
 @login_required
