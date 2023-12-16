@@ -95,16 +95,25 @@ def logout_view(request):
 @login_required
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+
+    # Проверяем, голосовал ли пользователь ранее в данном опросе
+    user_has_voted = question.choice_set.filter(voters=request.user.userprofile).exists()
+
+    if user_has_voted:
+        return render(request, 'polls/detail.html', {
+            'question': question,
+            'error_message': 'Вы уже голосовали в этом опросе.'
+        })
+
     try:
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
         return render(request, 'polls/detail.html', {
             'question': question,
-            'error_message': 'вы не сделали выбор'
+            'error_message': 'Вы не сделали выбор'
         })
     else:
-        selected_choice.votes += 1
-        selected_choice.save()
+        selected_choice.voters.add(request.user.userprofile)
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 

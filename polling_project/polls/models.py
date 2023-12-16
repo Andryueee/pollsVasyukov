@@ -32,8 +32,10 @@ class Question(models.Model):
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+    voters = models.ManyToManyField(UserProfile)  # Используем связь с UserProfile
 
-    def __str__(self):
-        return self.choice_text
 
+class Vote(models.Model):
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    voter = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
